@@ -291,8 +291,6 @@ static void handle_dma_rx_isr(spi_ports_t port) {
     DMA_ClearITPendingBit(PORT.dma.rx_stream, PORT.dma.rx_it_flag);
     DMA_ITConfig(PORT.dma.rx_stream, DMA_IT_TC, DISABLE);
 
-    DMA_TRANSFER_DONE = 1;
-
     DMA_ClearFlag(PORT.dma.rx_stream, PORT.dma.rx_tci_flag);
     DMA_ClearFlag(PORT.dma.tx_stream, PORT.dma.tx_tci_flag);
 
@@ -318,6 +316,7 @@ static void handle_dma_rx_isr(spi_ports_t port) {
       sdcard_dma_rx_isr();
     }
 #endif
+    DMA_TRANSFER_DONE = 1;
   }
 }
 
