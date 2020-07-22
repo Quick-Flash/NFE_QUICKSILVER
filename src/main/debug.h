@@ -23,3 +23,25 @@ typedef struct debug {
 extern debug_type debug;
 
 #endif
+
+typedef enum {
+  PERF_COUNTER_TOTAL,
+  PERF_COUNTER_GYRO,
+  PERF_COUNTER_CONTROL,
+  PERF_COUNTER_RX,
+  PERF_COUNTER_OSD,
+  PERF_COUNTER_BLACKBOX,
+
+  PERF_COUNTER_MAX
+} perf_counters_t;
+
+typedef struct {
+  uint32_t min;
+  uint32_t max;
+  uint32_t current;
+} perf_counter_t;
+
+extern perf_counter_t perf_counters[PERF_COUNTER_MAX];
+
+void perf_counter_start(perf_counters_t counter);
+void perf_counter_end(perf_counters_t counter);

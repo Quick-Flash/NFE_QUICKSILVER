@@ -184,7 +184,10 @@ int main(void) {
     state.looptime = ((uint32_t)(time - lastlooptime));
     lastlooptime = time;
 
-    { // gettime() needs to be called at least once per second
+    perf_counter_start(PERF_COUNTER_TOTAL);
+
+    // gettime() needs to be called at least once per second
+    {
       volatile uint32_t _ = gettime();
       _;
     }
@@ -229,10 +232,14 @@ int main(void) {
     }
 
     // read gyro and accelerometer data
+    perf_counter_start(PERF_COUNTER_GYRO);
     sixaxis_read();
+    perf_counter_end(PERF_COUNTER_GYRO);
 
     // all flight calculations and motors
+    perf_counter_start(PERF_COUNTER_CONTROL);
     control();
+    perf_counter_start(PERF_COUNTER_CONTROL);
 
     // attitude calculations for level mode
     imu_calc();
@@ -332,6 +339,7 @@ int main(void) {
 #endif
 
     // receiver function
+    perf_counter_start(PERF_COUNTER_RX);
 #ifdef SERIAL_RX
     // if our RX is a serial, only check if we have valid usart and its the one currently active
     if (serial_rx_port == profile.serial.rx && serial_rx_port != USART_PORT_INVALID) {
@@ -341,13 +349,19 @@ int main(void) {
     // we have a spi RX
     rx_check();
 #endif
+    perf_counter_end(PERF_COUNTER_RX);
 
 #ifdef ENABLE_OSD
+    perf_counter_start(PERF_COUNTER_OSD);
     osd_display();
+    perf_counter_end(PERF_COUNTER_OSD);
 #endif
 
 #ifdef F4
+    perf_counter_start(PERF_COUNTER_BLACKBOX);
     blackbox_update();
+    perf_counter_end(PERF_COUNTER_BLACKBOX);
+
     if (usb_detect()) {
       flags.usb_active = 1;
 #ifndef ALLOW_USB_ARMING
@@ -404,6 +418,8 @@ int main(void) {
 
     loop_counter++;
 #endif
+
+    perf_counter_end(PERF_COUNTER_TOTAL);
 
     while ((timer_micros() - time) < state.looptime_autodetect)
       __NOP();
