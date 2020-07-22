@@ -22,6 +22,10 @@ void debug_timer_init() {
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 }
 
+uint32_t timer_cycles() {
+  return DWT->CYCCNT;
+}
+
 uint32_t debug_timer_micros() {
   static uint32_t total_micros = 0;
   static uint32_t last_micros = 0;

@@ -168,6 +168,8 @@ int main(void) {
     failloop(7);
   }
 
+  perf_counter_init();
+
   lastlooptime = timer_micros();
 
   //
@@ -420,6 +422,7 @@ int main(void) {
 #endif
 
     perf_counter_end(PERF_COUNTER_TOTAL);
+    perf_counter_update();
 
     while ((timer_micros() - time) < state.looptime_autodetect)
       __NOP();
