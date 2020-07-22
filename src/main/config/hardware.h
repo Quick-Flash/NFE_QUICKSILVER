@@ -149,6 +149,10 @@
 #define USE_SERIAL_4WAY_BLHELI_INTERFACE
 #endif
 
+#if defined(USE_M25P16) || defined(USE_SDCARD)
+#define ENABLE_BLACKBOX
+#endif
+
 // pwm pins disable
 // disable all pwm pins / function
 //#define DISABLE_PWM_PINS

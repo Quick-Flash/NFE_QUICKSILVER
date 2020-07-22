@@ -151,7 +151,10 @@ int main(void) {
 
   gyro_cal();
   rgb_init();
+
+#ifdef ENABLE_BLACKBOX
   blackbox_init();
+#endif
 
 #ifdef SERIAL_ENABLE
   serial_init();
@@ -359,7 +362,7 @@ int main(void) {
     perf_counter_end(PERF_COUNTER_OSD);
 #endif
 
-#ifdef F4
+#ifdef ENABLE_BLACKBOX
     perf_counter_start(PERF_COUNTER_BLACKBOX);
     blackbox_update();
     perf_counter_end(PERF_COUNTER_BLACKBOX);
