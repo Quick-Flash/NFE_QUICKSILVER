@@ -115,13 +115,13 @@ void bitbang_data(void);
 void motor_init() {
   GPIO_InitTypeDef GPIO_InitStructure;
 
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 
 #define MOTOR_PIN(port, pin, pin_af, timer, timer_channel) \
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_##pin;            \
+  GPIO_InitStructure.GPIO_Pin = LL_GPIO_PIN_##pin;         \
   GPIO_Init(GPIO##port, &GPIO_InitStructure);
 
   MOTOR_PINS
@@ -180,7 +180,7 @@ void motor_set(uint8_t number, float pwm) {
         value = 0;
 
 #define MOTOR_PIN(port, pin, pin_af, timer, timer_channel) \
-  gpioreset(GPIO##port, GPIO_Pin_##pin);
+  gpioreset(GPIO##port, LL_GPIO_PIN_##pin);
 
         MOTOR_PINS
 
@@ -280,7 +280,7 @@ void make_packet(uint8_t number, uint16_t value, bool telemetry) {
 
 #define MOTOR_SET(...) gpioset(__VA_ARGS__)
 #define MOTOR_RESET(...) gpioreset(__VA_ARGS__)
-#define MOTOR_PIN(port, pin, pin_af, timer, timer_channel) GPIO##port, GPIO_Pin_##pin
+#define MOTOR_PIN(port, pin, pin_af, timer, timer_channel) GPIO##port, LL_GPIO_PIN_##pin
 
 void bitbang_data1() {
   for (uint8_t i = 0; i < 48; ++i) {

@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 
+#include <stm32f4xx_ll_usart.h>
+
 #include "drv_serial.h"
 #include "drv_time.h"
 #include "profile.h"
@@ -51,30 +53,33 @@ static uint8_t frame[SMART_AUDIO_BUFFER_SIZE];
 static uint8_t frame_length = 0;
 
 static void serial_smart_audio_reconfigure() {
-  USART_Cmd(USART.channel, DISABLE);
+  LL_USART_Disable(USART.channel);
 
-  GPIO_InitTypeDef GPIO_InitStructure;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  LL_GPIO_InitTypeDef GPIO_InitStructure;
+  GPIO_InitStructure.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStructure.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStructure.Pull = LL_GPIO_PULL_DOWN;
+  GPIO_InitStructure.Speed = LL_GPIO_SPEED_FREQ_HIGH;
   gpio_pin_init_af(&GPIO_InitStructure, USART.tx_pin, USART.gpio_af);
 
-  USART_InitTypeDef USART_InitStructure;
-  USART_InitStructure.USART_BaudRate = baud_rate;
-  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-  USART_InitStructure.USART_StopBits = USART_StopBits_2;
-  USART_InitStructure.USART_Parity = USART_Parity_No;
-  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
-  USART_Init(USART.channel, &USART_InitStructure);
+  LL_USART_InitTypeDef USART_InitStructure;
+  USART_InitStructure.BaudRate = baud_rate;
+  USART_InitStructure.DataWidth = LL_USART_DATAWIDTH_8B;
+  USART_InitStructure.StopBits = LL_USART_STOPBITS_2;
+  USART_InitStructure.Parity = LL_USART_PARITY_NONE;
+  USART_InitStructure.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
+  USART_InitStructure.TransferDirection = LL_USART_DIRECTION_TX | LL_USART_DIRECTION_RX;
+  USART_InitStructure.OverSampling = LL_USART_OVERSAMPLING_16;
+  LL_USART_Init(USART.channel, &USART_InitStructure);
 
-  USART_HalfDuplexCmd(USART.channel, ENABLE);
-  USART_ClearFlag(USART.channel, USART_FLAG_RXNE | USART_FLAG_TC);
-  USART_ClearITPendingBit(USART.channel, USART_IT_RXNE | USART_IT_TC);
-  USART_ITConfig(USART.channel, USART_IT_TC, ENABLE);
-  USART_ITConfig(USART.channel, USART_IT_RXNE, ENABLE);
-  USART_Cmd(USART.channel, ENABLE);
+  LL_USART_EnableHalfDuplex(USART.channel);
+
+  LL_USART_ClearFlag_TC(USART.channel);
+
+  LL_USART_EnableIT_TC(USART.channel);
+  LL_USART_EnableIT_RXNE(USART.channel);
+
+  LL_USART_Enable(USART.channel);
 }
 
 static void smart_audio_auto_baud() {
@@ -141,7 +146,7 @@ static void serial_smart_audio_send_data(uint8_t *data, uint32_t size) {
   transfer_done = 0;
 
   for (uint32_t i = 0; i < size; i++) {
-    for (uint32_t timeout = 0x1000; USART_GetFlagStatus(USART.channel, USART_FLAG_TXE) == RESET; timeout--) {
+    for (uint32_t timeout = 0x1000; LL_USART_IsActiveFlag_TXE(USART.channel) == RESET; timeout--) {
       if (timeout == 0) {
         quic_debugf("SMART_AUDIO: send timeout");
         return;
@@ -149,7 +154,7 @@ static void serial_smart_audio_send_data(uint8_t *data, uint32_t size) {
       timer_delay_us(1);
       __WFI();
     }
-    USART_SendData(USART.channel, data[i]);
+    LL_USART_TransmitData8(USART.channel, data[i]);
   }
   packets_sent++;
 }
@@ -222,18 +227,18 @@ void serial_smart_audio_init(void) {
 }
 
 void smart_audio_uart_isr(void) {
-  if (USART_GetITStatus(USART.channel, USART_IT_TC) != RESET) {
+  if (LL_USART_IsActiveFlag_TC(USART.channel)) {
+    LL_USART_ClearFlag_TC(USART.channel);
     transfer_done = 1;
-    USART_ClearITPendingBit(USART.channel, USART_IT_TC);
   }
 
-  if (USART_GetITStatus(USART.channel, USART_IT_RXNE) != RESET) {
-    USART_ClearITPendingBit(USART.channel, USART_IT_RXNE);
-    circular_buffer_write(&smart_audio_rx_buffer, USART_ReceiveData(USART.channel));
+  if (LL_USART_IsActiveFlag_RXNE(USART.channel)) {
+    const uint8_t data = LL_USART_ReceiveData8(USART.channel);
+    circular_buffer_write(&smart_audio_rx_buffer, data);
   }
 
-  if (USART_GetFlagStatus(USART.channel, USART_FLAG_ORE)) {
-    USART_ClearFlag(USART.channel, USART_FLAG_ORE);
+  if (LL_USART_IsActiveFlag_ORE(USART.channel)) {
+    LL_USART_ClearFlag_ORE(USART.channel);
   }
 }
 

@@ -69,7 +69,6 @@ int main(void) {
 
   // load default profile
   profile_set_defaults();
-
   // setup filters early
   filter_global_init();
   pid_init();
@@ -497,7 +496,7 @@ static void setup_4way_external_interrupt(void) {
 // start byte (0x2F) on PA14 at 38400 baud
 void EXTI4_15_IRQHandler(void) {
   if ((EXTI->IMR & EXTI_IMR_MR14) && (EXTI->PR & EXTI_PR_PR14)) {
-#define IS_RX_HIGH (GPIOA->IDR & GPIO_Pin_14)
+#define IS_RX_HIGH (GPIOA->IDR & LL_GPIO_PIN_14)
     uint32_t micros_per_bit = 26;
     uint32_t micros_per_bit_half = 13;
 

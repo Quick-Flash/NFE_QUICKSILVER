@@ -109,27 +109,27 @@ void make_packet(uint8_t number, uint16_t value, bool telemetry);
 
 void motor_init() {
   GPIO_InitTypeDef GPIO_InitStructure;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 
 #define MOTOR_PIN(port, pin, pin_af, timer, timer_channel) \
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_##pin;            \
+  GPIO_InitStructure.GPIO_Pin = LL_GPIO_PIN_##pin;         \
   GPIO_Init(GPIO##port, &GPIO_InitStructure);              \
   if (GPIO##port == GPIOA) {                               \
     DSHOT_GPIO_A = 1;                                      \
-    *dshot_portA |= GPIO_Pin_##pin;                        \
+    *dshot_portA |= LL_GPIO_PIN_##pin;                     \
   } else if (GPIO##port == GPIOB) {                        \
     DSHOT_GPIO_B = 1;                                      \
-    *dshot_portB |= GPIO_Pin_##pin;                        \
+    *dshot_portB |= LL_GPIO_PIN_##pin;                     \
   }
 
   MOTOR_PINS
 
 #undef MOTOR_PIN
 
-  //GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+  //GPIO_InitStructure.GPIO_Pin = LL_GPIO_PIN_3;
   //GPIO_Init(GPIOA, &GPIO_InitStructure);
 
   // DShot timer/DMA init
@@ -154,66 +154,66 @@ void motor_init() {
   TIM_ARRPreloadConfig(TIM1, DISABLE);
 
   /* Timing Mode configuration: Channel 1 */
-  TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Timing;
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable;
-  TIM_OCInitStructure.TIM_Pulse = DSHOT_T0H_TIME;
-  TIM_OC1Init(TIM1, &TIM_OCInitStructure);
-  TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Disable);
+  TIM_OCInitStructure.OCMode = LL_TIM_OCMODE_FROZEN;
+  TIM_OCInitStructure.OCState = LL_TIM_OCSTATE_DISABLE;
+  TIM_OCInitStructure.CompareValue = DSHOT_T0H_TIME;
+  LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH1, &TIM_OCInitStructure);
+  LL_TIM_OC_DisablePreload(TIM1, LL_TIM_CHANNEL_CH1);
 
   /* Timing Mode configuration: Channel 4 */
-  TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Timing;
-  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Disable;
-  TIM_OCInitStructure.TIM_Pulse = DSHOT_T1H_TIME;
-  TIM_OC4Init(TIM1, &TIM_OCInitStructure);
-  TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Disable);
+  TIM_OCInitStructure.OCMode = LL_TIM_OCMODE_FROZEN;
+  TIM_OCInitStructure.OCState = LL_TIM_OCSTATE_DISABLE;
+  TIM_OCInitStructure.CompareValue = DSHOT_T1H_TIME;
+  LL_TIM_OC_Init(TIM1, LL_TIM_CHANNEL_CH4, &TIM_OCInitStructure);
+  LL_TIM_OC_DisablePreload(TIM1, LL_TIM_CHANNEL_CH4);
 
-  DMA_InitTypeDef DMA_InitStructure;
+  LL_DMA_InitTypeDef DMA_InitStructure;
 
-  DMA_StructInit(&DMA_InitStructure);
+  LL_DMA_StructInit(&DMA_InitStructure);
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
   /* DMA1 Channe5 configuration ----------------------------------------------*/
-  DMA_DeInit(DMA1_Channel5);
-  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&GPIOA->BSRR;
+  LL_DMA_DeInit(DMA1_Channel5);
+  DMA_InitStructure.PeriphOrM2MSrcAddress = (uint32_t)&GPIOA->BSRR;
   DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)dshot_portA;
-  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-  DMA_InitStructure.DMA_BufferSize = 16;
-  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
-  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-  DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+  DMA_InitStructure.Direction = DMA_DIR_PeripheralDST;
+  DMA_InitStructure.NbData = 16;
+  DMA_InitStructure.PeriphOrM2MSrcIncMode = LL_DMA_PERIPH_NOINCREMENT;
+  DMA_InitStructure.MemoryOrM2MDstIncMode = LL_DMA_MEMORY_NOINCREMENT;
+  DMA_InitStructure.PeriphOrM2MSrcDataSize = LL_DMA_PDATAALIGN_HALFWORD;
+  DMA_InitStructure.MemoryOrM2MDstDataSize = LL_DMA_MDATAALIGN_HALFWORD;
+  DMA_InitStructure.Mode = LL_DMA_MODE_NORMAL;
+  DMA_InitStructure.Priority = LL_DMA_PRIORITY_HIGH;
   DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
   DMA_Init(DMA1_Channel5, &DMA_InitStructure);
 
   /* DMA1 Channel2 configuration ----------------------------------------------*/
-  DMA_DeInit(DMA1_Channel2);
-  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&GPIOA->BRR;
+  LL_DMA_DeInit(DMA1_Channel2);
+  DMA_InitStructure.PeriphOrM2MSrcAddress = (uint32_t)&GPIOA->BRR;
   DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)motor_data_portA;
-  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-  DMA_InitStructure.DMA_BufferSize = 16;
-  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-  DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+  DMA_InitStructure.Direction = DMA_DIR_PeripheralDST;
+  DMA_InitStructure.NbData = 16;
+  DMA_InitStructure.PeriphOrM2MSrcIncMode = LL_DMA_PERIPH_NOINCREMENT;
+  DMA_InitStructure.MemoryOrM2MDstIncMode = LL_DMA_MEMORY_INCREMENT;
+  DMA_InitStructure.PeriphOrM2MSrcDataSize = LL_DMA_PDATAALIGN_HALFWORD;
+  DMA_InitStructure.MemoryOrM2MDstDataSize = LL_DMA_MDATAALIGN_HALFWORD;
+  DMA_InitStructure.Mode = LL_DMA_MODE_NORMAL;
+  DMA_InitStructure.Priority = LL_DMA_PRIORITY_HIGH;
   DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
   DMA_Init(DMA1_Channel2, &DMA_InitStructure);
 
   /* DMA1 Channel4 configuration ----------------------------------------------*/
-  DMA_DeInit(DMA1_Channel4);
-  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&GPIOA->BRR;
+  LL_DMA_DeInit(DMA1_Channel4);
+  DMA_InitStructure.PeriphOrM2MSrcAddress = (uint32_t)&GPIOA->BRR;
   DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)dshot_portA;
-  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-  DMA_InitStructure.DMA_BufferSize = 16;
-  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Disable;
-  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-  DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+  DMA_InitStructure.Direction = DMA_DIR_PeripheralDST;
+  DMA_InitStructure.NbData = 16;
+  DMA_InitStructure.PeriphOrM2MSrcIncMode = LL_DMA_PERIPH_NOINCREMENT;
+  DMA_InitStructure.MemoryOrM2MDstIncMode = LL_DMA_MEMORY_NOINCREMENT;
+  DMA_InitStructure.PeriphOrM2MSrcDataSize = LL_DMA_PDATAALIGN_HALFWORD;
+  DMA_InitStructure.MemoryOrM2MDstDataSize = LL_DMA_MDATAALIGN_HALFWORD;
+  DMA_InitStructure.Mode = LL_DMA_MODE_NORMAL;
+  DMA_InitStructure.Priority = LL_DMA_PRIORITY_HIGH;
   DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
   DMA_Init(DMA1_Channel4, &DMA_InitStructure);
 
@@ -222,7 +222,7 @@ void motor_init() {
   NVIC_InitTypeDef NVIC_InitStructure;
   /* configure DMA1 Channel4 interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel4_5_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPriority = (uint8_t)DMA_Priority_High;
+  NVIC_InitStructure.NVIC_IRQChannelPriority = (uint8_t)LL_DMA_PRIORITY_HIGH;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
   /* enable DMA1 Channel4 transfer complete interrupt */
@@ -363,7 +363,7 @@ void dshot_dma_start() {
   TIM1->CCR1 = DSHOT_T0H_TIME;
   TIM1->CCR4 = DSHOT_T1H_TIME;
 
-  DMA1_Channel2->CCR |= DMA_MemoryDataSize_HalfWord | DMA_PeripheralDataSize_HalfWord; // switch from byte to halfword
+  DMA1_Channel2->CCR |= LL_DMA_MDATAALIGN_HALFWORD | LL_DMA_PDATAALIGN_HALFWORD; // switch from byte to halfword
 
   dshot_dma_portA();
 }

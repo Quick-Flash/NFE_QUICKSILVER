@@ -8,7 +8,7 @@
 #ifdef USE_SOFTWARE_I2C
 //#define i2cdebug
 
-static GPIO_InitTypeDef sdainit;
+static LL_GPIO_InitTypeDef sdainit;
 
 void delay(int);
 
@@ -152,16 +152,16 @@ void sclhighlow() {
 #endif
 void setinput() {
   sdaout = 0;
-  sdainit.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_Init(I2C_SDAPORT, &sdainit);
+  sdainit.Mode = LL_GPIO_MODE_INPUT;
+  LL_GPIO_Init(I2C_SDAPORT, &sdainit);
 
   _delay2;
 }
 
 void setoutput() {
   sdaout = 1;
-  sdainit.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_Init(I2C_SDAPORT, &sdainit);
+  sdainit.Mode = LL_GPIO_MODE_OUTPUT;
+  LL_GPIO_Init(I2C_SDAPORT, &sdainit);
   _delay2;
 }
 
@@ -350,29 +350,29 @@ void softi2c_readdata(int device_address, int register_address, int *data, int s
 
 void softi2c_init() {
 
-  GPIO_InitTypeDef GPIO_InitStructure;
+  LL_GPIO_InitTypeDef GPIO_InitStructure;
 
-  GPIO_InitStructure.GPIO_Pin = I2C_SDAPIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(I2C_SCLPORT, &GPIO_InitStructure);
+  GPIO_InitStructure.Pin = I2C_SDAPIN;
+  GPIO_InitStructure.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStructure.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
+  GPIO_InitStructure.Pull = LL_GPIO_PULL_UP;
+  GPIO_InitStructure.Speed = LL_GPIO_SPEED_FREQ_HIGH;
+  LL_GPIO_Init(I2C_SCLPORT, &GPIO_InitStructure);
 
 // some boards have no SCL pullup, we drive SCL pullup for better speed on those
 // the factory firmware does this too, so it must be ok
 #ifdef SOFTI2C_PUSHPULL_CLK
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
 #endif
 
-  GPIO_InitStructure.GPIO_Pin = I2C_SCLPIN;
-  GPIO_Init(I2C_SDAPORT, &GPIO_InitStructure);
+  GPIO_InitStructure.Pin = I2C_SCLPIN;
+  LL_GPIO_Init(I2C_SDAPORT, &GPIO_InitStructure);
 
-  sdainit.GPIO_Pin = I2C_SDAPIN;
-  sdainit.GPIO_Mode = GPIO_Mode_IN;
-  sdainit.GPIO_OType = GPIO_OType_OD;
-  sdainit.GPIO_PuPd = GPIO_PuPd_UP;
-  sdainit.GPIO_Speed = GPIO_Speed_50MHz;
+  sdainit.Pin = I2C_SDAPIN;
+  sdainit.Mode = LL_GPIO_MODE_INPUT;
+  sdainit.OutputType = LL_GPIO_OUTPUT_OPENDRAIN;
+  sdainit.Pull = LL_GPIO_PULL_UP;
+  sdainit.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 
   sdaout = 1;
   sda = 0;

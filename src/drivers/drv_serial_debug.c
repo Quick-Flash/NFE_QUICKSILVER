@@ -23,42 +23,42 @@ char buffer_end = 0;
 
 void USART1_IRQHandler(void) {
   if (buffer_end != buffer_start) {
-    USART_SendData(USART1, buffer[buffer_start]);
+    LL_USART_TransmitData8(USART1, buffer[buffer_start]);
     buffer_start++;
     buffer_start = buffer_start % (SERIAL_BUFFER_SIZE);
   } else {
-    USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+    LL_USART_DisableIT_TXE(USART1);
   }
 }
 
 void serial_debug_init(void) {
 
-  GPIO_InitTypeDef GPIO_InitStructure;
+  LL_GPIO_InitTypeDef GPIO_InitStructure;
 
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.Mode = LL_GPIO_MODE_ALTERNATE;
+  GPIO_InitStructure.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  GPIO_InitStructure.Pull = LL_GPIO_PULL_NO;
+  GPIO_InitStructure.Speed = LL_GPIO_SPEED_FREQ_HIGH;
 
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);
+  GPIO_InitStructure.Pin = LL_GPIO_PIN_14;
+  LL_GPIO_Init(GPIOA, &GPIO_InitStructure);
 
   GPIO_PinAFConfig(GPIOA, GPIO_PinSource14, GPIO_AF_1);
 
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
-  USART_InitTypeDef USART_InitStructure;
+  LL_USART_InitTypeDef USART_InitStructure;
 
-  USART_InitStructure.USART_BaudRate = SERIAL_BAUDRATE;
-  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-  USART_InitStructure.USART_StopBits = USART_StopBits_1;
-  USART_InitStructure.USART_Parity = USART_Parity_No;
-  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.USART_Mode = USART_Mode_Tx; //USART_Mode_Rx | USART_Mode_Tx;
+  USART_InitStructure.BaudRate = SERIAL_BAUDRATE;
+  USART_InitStructure.DataWidth = LL_USART_DATAWIDTH_8B;
+  USART_InitStructure.StopBits = LL_USART_STOPBITS_1;
+  USART_InitStructure.Parity = LL_USART_PARITY_NONE;
+  USART_InitStructure.HardwareFlowControl = LL_USART_HWCONTROL_NONE;
+  USART_InitStructure.TransferDirection = LL_USART_DIRECTION_TX; //LL_USART_DIRECTION_RX | LL_USART_DIRECTION_TX;
 
   USART_Init(USART1, &USART_InitStructure);
 
-  //	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+  //	LL_USART_EnableIT_TXE(USART1);
   USART_Cmd(USART1, ENABLE);
 
   NVIC_InitTypeDef NVIC_InitStructure;
@@ -74,7 +74,7 @@ int fputc(int ch, FILE *f) {
   buffer_end++;
   buffer_end = buffer_end % (SERIAL_BUFFER_SIZE);
 
-  USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+  LL_USART_EnableIT_TXE(USART1);
   return ch;
 }
 
@@ -83,7 +83,7 @@ void buffer_add(int val) {
   buffer_end++;
   buffer_end = buffer_end % (SERIAL_BUFFER_SIZE);
 
-  USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+  LL_USART_EnableIT_TXE(USART1);
   return;
 }
 

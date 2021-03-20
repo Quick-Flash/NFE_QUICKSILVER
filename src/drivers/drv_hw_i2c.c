@@ -84,17 +84,17 @@ void hw_i2c_init(void) {
 
   GPIO_InitTypeDef gpioinitI2C1;
 
-  gpioinitI2C1.GPIO_Mode = GPIO_Mode_AF;
+  gpioinitI2C1.GPIO_Mode = LL_GPIO_MODE_ALTERNATE;
   gpioinitI2C1.GPIO_OType = GPIO_OType_OD;
   gpioinitI2C1.GPIO_PuPd = GPIO_PuPd_UP;
 
 #ifdef HW_I2C_PINS_PB67
-  gpioinitI2C1.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
+  gpioinitI2C1.GPIO_Pin = LL_GPIO_PIN_6 | LL_GPIO_PIN_7;
   GPIO_Init(GPIOB, &gpioinitI2C1);
 #endif
 
 #ifdef HW_I2C_PINS_PA910
-  gpioinitI2C1.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10;
+  gpioinitI2C1.GPIO_Pin = LL_GPIO_PIN_9 | LL_GPIO_PIN_10;
   GPIO_Init(GPIOA, &gpioinitI2C1);
 #endif
 
