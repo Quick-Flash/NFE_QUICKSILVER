@@ -25,10 +25,8 @@
 #define JEDEC_ID_CYPRESS_S25FL128L 0x016018
 #define JEDEC_ID_BERGMICRO_W25Q32 0xE04016
 
-void m25p16_init() {
-  spi_init_pins(M25P16_SPI_PORT, M25P16_NSS_PIN);
-
-  spi_enable_rcc(M25P16_SPI_PORT);
+static void m25p16_reinit() {
+  SPI_Cmd(SPI_PORT.channel, DISABLE);
 
   SPI_I2S_DeInit(SPI_PORT.channel);
   SPI_InitTypeDef SPI_InitStructure;
@@ -43,6 +41,14 @@ void m25p16_init() {
   SPI_InitStructure.SPI_CRCPolynomial = 7;
   SPI_Init(SPI_PORT.channel, &SPI_InitStructure);
   SPI_Cmd(SPI_PORT.channel, ENABLE);
+}
+
+void m25p16_init() {
+  spi_init_pins(M25P16_SPI_PORT, M25P16_NSS_PIN);
+
+  spi_enable_rcc(M25P16_SPI_PORT);
+
+  m25p16_reinit();
 
   // Dummy read to clear receive buffer
   while (SPI_I2S_GetFlagStatus(SPI_PORT.channel, SPI_I2S_FLAG_TXE) == RESET)
@@ -69,6 +75,7 @@ uint8_t m25p16_is_ready() {
   read_status[0] = M25P16_READ_STATUS_REGISTER;
   read_status[1] = 0x0;
 
+  m25p16_reinit();
   spi_csn_enable(M25P16_NSS_PIN);
   spi_dma_transfer_begin(M25P16_SPI_PORT, read_status, 2);
   read_status_in_progress = 1;
@@ -130,11 +137,16 @@ uint8_t m25p16_page_program(const uint32_t addr, const uint8_t *buf, const uint3
 
   if (write_enabled == 0) {
     write_enable[0] = M25P16_WRITE_ENABLE;
+
+    m25p16_reinit();
+
     spi_csn_enable(M25P16_NSS_PIN);
     spi_dma_transfer_begin(M25P16_SPI_PORT, write_enable, 1);
     write_enabled = 1;
     return 0;
   }
+
+  m25p16_reinit();
 
   spi_csn_enable(M25P16_NSS_PIN);
 
