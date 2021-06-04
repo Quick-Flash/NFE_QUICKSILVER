@@ -120,16 +120,16 @@ int softserial_read_byte_ex(const SoftSerialData_t *data, uint8_t *byte) {
   int i = 0;
   uint8_t b = 0;
 
-  uint32_t time_start = gettime();
+  uint32_t time_start = timer_micros();
   uint32_t time_next = time_start;
   while (!IS_RX_HIGH(data)) {
-    time_next = gettime(); //wait for start bit
+    time_next = timer_micros(); //wait for start bit
     if (time_next - time_start > 10000)
       return 0;
   }
   while (IS_RX_HIGH(data)) // start bit falling edge
   {
-    time_next = gettime(); //wait for start bit
+    time_next = timer_micros(); //wait for start bit
     if (time_next - time_start > 10000)
       return 0;
   }
@@ -167,7 +167,7 @@ void softserial_write_byte_ex(const SoftSerialData_t *data, uint8_t byte) {
   int i = 0;
 
   START_BIT(data);
-  uint32_t next_time = gettime();
+  uint32_t next_time = timer_micros();
 
   for (; i < 8; ++i) {
     next_time += data->micros_per_bit;

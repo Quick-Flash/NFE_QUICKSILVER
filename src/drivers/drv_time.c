@@ -108,11 +108,6 @@ uint32_t time_update() {
   return globalticks;
 }
 
-// return time in uS from start (micros())
-uint32_t gettime() {
-  return time_update();
-}
-
 // delay in uS
 void delay(uint32_t data) {
 #ifdef F411
@@ -149,11 +144,10 @@ void timer_delay_us(uint32_t us) {
 
 #endif
 
-
 void SysTick_Handler(void) {
 }
 
 void delay_until(uint32_t uS) {
-  while (gettime() < uS)
+  while (timer_micros() < uS)
     ;
 }

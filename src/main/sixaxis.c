@@ -83,7 +83,7 @@ void sixaxis_init(void) {
 extern target_info_t target_info;
 
 int sixaxis_check(void) {
-// read "who am I" register
+  // read "who am I" register
   uint8_t id = MPU6XXX_dma_spi_read(MPU_RA_WHO_AM_I);
 
 #ifdef DEBUG
@@ -208,7 +208,7 @@ void sixaxis_read(void) {
 void gyro_cal(void) {
   int data[6];
   float limit[3];
-  unsigned long time = gettime();
+  unsigned long time = timer_micros();
   unsigned long timestart = time;
   unsigned long timemax = time;
   unsigned long lastlooptime = time;
@@ -252,16 +252,16 @@ void gyro_cal(void) {
       limitf(&limit[i], 800);
 
       if (fabsf(gyro[i]) > 100 + fabsf(limit[i])) {
-        timestart = gettime();
+        timestart = timer_micros();
         brightness = 1;
       } else {
         lpf(&gyrocal[i], gyro[i], lpfcalc((float)looptime, 0.5 * 1e6));
       }
     }
 
-    while ((gettime() - time) < 1000)
+    while ((timer_micros() - time) < 1000)
       delay(10);
-    time = gettime();
+    time = timer_micros();
   }
 
   if (time - timestart < CAL_TIME) {
@@ -278,7 +278,7 @@ void acc_cal(void) {
     for (int x = 0; x < 3; x++) {
       lpf(&flash_storage.accelcal[x], state.accel_raw.axis[x], 0.92);
     }
-    gettime(); // if it takes too long time will overflow so we call it here
+    timer_micros(); // if it takes too long time will overflow so we call it here
   }
   flash_storage.accelcal[2] -= 2048;
 

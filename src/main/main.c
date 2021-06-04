@@ -62,7 +62,7 @@ static void setup_4way_external_interrupt(void);
 int random_seed = 0;
 
 int main(void) {
-//init some initial values
+  //init some initial values
   //attempt 8k looptime for f405 or 4k looptime for f411
   state.looptime_autodetect = LOOPTIME;
   // load default profile
@@ -77,7 +77,7 @@ int main(void) {
 
   delay(1000);
 
-//init some hardware things
+  //init some hardware things
   gpio_init();
   usb_init();
   ledon(255); //Turn on LED during boot so that if a delay is used as part of using programming pins for other functions, the FC does not appear inactive while programming times out
@@ -90,7 +90,7 @@ int main(void) {
 
   delay(100000);
 
-//init the firmware things
+  //init the firmware things
   motor_init();
   motor_set_all(0);
   sixaxis_init();
@@ -159,11 +159,6 @@ int main(void) {
     uint32_t time = timer_micros();
     state.looptime = ((uint32_t)(time - lastlooptime));
     lastlooptime = time;
-
-    { // gettime() needs to be called at least once per second
-      volatile uint32_t _ = gettime();
-      _;
-    }
 
     if (state.looptime <= 0)
       state.looptime = 1;
@@ -235,14 +230,14 @@ int main(void) {
             int leds_on = !rx_aux_on(AUX_LEDS_ON);
             if (ledcommand) {
               if (!ledcommandtime)
-                ledcommandtime = gettime();
-              if (gettime() - ledcommandtime > 500000) {
+                ledcommandtime = timer_micros();
+              if (timer_micros() - ledcommandtime > 500000) {
                 ledcommand = 0;
                 ledcommandtime = 0;
               }
               ledflash(100000, 8);
             } else if (ledblink) {
-              unsigned long time = gettime();
+              unsigned long time = timer_micros();
               if (!ledcommandtime) {
                 ledcommandtime = time;
                 if (leds_on)
@@ -436,4 +431,3 @@ void BusFault_Handler(void) {
 void UsageFault_Handler(void) {
   handle_fault();
 }
-

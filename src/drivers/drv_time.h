@@ -4,7 +4,6 @@
 
 void timer_init();
 
-uint32_t gettime();
 uint32_t timer_micros();
 uint32_t timer_millis();
 

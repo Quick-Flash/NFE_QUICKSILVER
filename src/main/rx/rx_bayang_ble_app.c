@@ -490,7 +490,7 @@ void beacon_sequence() {
   switch (beacon_seq_state) {
   case 0:
     // send data if enough time passed since last send
-    if (gettime() - ble_txtime > BLE_INTERVAL) {
+    if (timer_micros() - ble_txtime > BLE_INTERVAL) {
       ble_send = 1;
       oldchan = rf_chan;
 
@@ -514,7 +514,7 @@ void beacon_sequence() {
       beacon_seq_state++;
       goto next;
     } else { // if it takes too long we get rid of it
-      if (gettime() - ble_txtime > BLE_TX_TIMEOUT) {
+      if (timer_micros() - ble_txtime > BLE_TX_TIMEOUT) {
 //SilverVISE - start
 #ifdef TX_POWER_ON_TLM
         xn_writereg(RF_SETUP, XN_POWER); // lna high current on ( better performance )
@@ -582,7 +582,7 @@ void send_beacon() {
   // SilverVISE - end
   int vbatt_comp_int = state.vbatt_comp * 1000.0f;
 
-  unsigned int time = gettime();
+  unsigned int time = timer_micros();
 
   time = time >> 20; // divide by 1024*1024, no time for accuracy here
   time = time * 10;
@@ -594,7 +594,7 @@ void send_beacon() {
 
   extern unsigned int total_time_in_air;
   extern unsigned int time_throttle_on;
-  unsigned int uptime = gettime();
+  unsigned int uptime = timer_micros();
 
   int TLMorPID = 0; // 0 = TLM, 1 = PID+TLM
 
@@ -831,7 +831,7 @@ buf[L++] =  time;
   payloadsize = L;
   xn_writepayload(buffint, L);
 
-  ble_txtime = gettime();
+  ble_txtime = timer_micros();
 
   return;
 }
@@ -951,7 +951,7 @@ void rx_check(void) {
     } else { // normal mode
 #ifdef RXDEBUG
       channelcount[rf_chan]++;
-      packettime = gettime() - lastrxtime;
+      packettime = timer_micros() - lastrxtime;
 
       if (skipchannel && !timingfail)
         afterskip[skipchannel]++;
@@ -960,7 +960,7 @@ void rx_check(void) {
 
 #endif
 
-      unsigned long temptime = gettime();
+      unsigned long temptime = timer_micros();
 
       nextchannel();
 
@@ -993,7 +993,7 @@ void rx_check(void) {
 
   beacon_sequence();
 
-  unsigned long time = gettime();
+  unsigned long time = timer_micros();
 
   // sequence period 12000
   if (time - lastrxtime > (HOPPING_NUMBER * PACKET_PERIOD + 1000) && flags.rx_mode != RX_MODE_BIND) {
@@ -1028,10 +1028,10 @@ void rx_check(void) {
     state.rx.axis[3] = 0;
   }
 #ifdef RXDEBUG
-  if (gettime() - secondtimer > 1000000) {
+  if (timer_micros() - secondtimer > 1000000) {
     packetpersecond = packetrx;
     packetrx = 0;
-    secondtimer = gettime();
+    secondtimer = timer_micros();
   }
 #endif
 }
