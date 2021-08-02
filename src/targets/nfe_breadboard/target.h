@@ -1,7 +1,7 @@
 #include "config.h"
 #include "config_helper.h"
 
-#define FPVCycleF411
+#define NFE_Breadboard
 
 #define F4
 #define F411
