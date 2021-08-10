@@ -1,13 +1,13 @@
 
 **NFE NOTES:**
-This repo is NOT the official QUICKSILVER firmware.  The real QUICKSILVER firmware is still an unfinished project.  
-This NFE fork has been created to create public visibility into the the QUICKSILVER source and to exist as a "sandbox" for my own quick and dirty code to try out new ideas and share them with friends.  It is my hope that this fork may positively influence the future outcome of the QUICKSILVER project.
+This repo is NOT the official QUICKSILVER firmware.  The real QUICKSILVER firmware is still an unfinished project and is on a development break at the time of updating this readme.  
+This NFE fork has been created to encourage public visibility into the QUICKSILVER source and to exist as a "sandbox" for my own quick and dirty code to try out new ideas and share them with friends.  It is my hope that this fork may positively influence the future outcome of the QUICKSILVER project.
 
 -----
 
 **WIKI NOTES** 
 
-1.  The aim of the project:  While QUICKSILVER strives to become a polished and capable contender as an open sourced flight controller firmware, the development needs of the project have far exceeded my own skill set to constructively contribute.  It is with that in mind that I have moved to a fork of the project in order to continue to pursue development of my own ideas which may not be well suited to, or properly polished for a legit public open sourced project.   
+1.  The aim of the project:  While QUICKSILVER strives to become a polished and capable contender as an open sourced flight controller firmware, the development needs of the project have far exceeded my own skill set to constructively contribute.  It is with that in mind that I have moved to a fork of the project in order to continue to pursue development of my own ideas which may not be well suited to, or properly polished for a legit public open sourced project.  Additionally, it is my hope that with the assistance of community involvement - documentation, tutorials, and wiki support material will be created to enhance the user experience.
 
 2.  Key features:  This initial release of the NFE fork has most of the open stable development branches of QUICKSILVER all smashed together.  Nothing new in flight algorithms vs QUICKSILVER source.
 
