@@ -10,6 +10,9 @@
 typedef enum {
   RATE_MODE_SILVERWARE,
   RATE_MODE_BETAFLIGHT,
+  RATE_MODE_ACTUAL,
+  RATE_MODE_KISS,
+  RATE_MODE_RACEFLIGHT,
 } rate_modes_t;
 
 typedef struct {
@@ -35,9 +38,46 @@ typedef struct {
   MEMBER(expo, vec3_t)
 
 typedef struct {
+  vec3_t center_sensitivity;
+  vec3_t max_rate;
+  vec3_t expo;
+} rate_mode_actual_t;
+
+#define ACTUAL_RATE_MEMBERS           \
+  MEMBER(center_sensitivity, vec3_t)  \
+  MEMBER(max_rate, vec3_t)            \
+  MEMBER(expo, vec3_t)
+
+typedef struct {
+  vec3_t rc_rate;
+  vec3_t rate;
+  vec3_t rc_curve;
+} rate_mode_kiss_t;
+
+#define KISS_RATE_MEMBERS       \
+  MEMBER(rc_rate, vec3_t)       \
+  MEMBER(rate, vec3_t)          \
+  MEMBER(rc_curve, vec3_t)
+
+typedef struct {
+  vec3_t rate;
+  vec3_t expo;
+  vec3_t acro_plus;
+} rate_mode_raceflight_t;
+
+#define RACEFLIGHT_RATE_MEMBERS \
+  MEMBER(rate, vec3_t)          \
+  MEMBER(expo, vec3_t)          \
+  MEMBER(acro_plus, vec3_t)
+
+
+typedef struct {
   rate_modes_t mode;
   rate_mode_silverware_t silverware;
   rate_mode_betaflight_t betaflight;
+  rate_mode_actual_t actual;
+  rate_mode_kiss_t kiss;
+  rate_mode_raceflight_t raceflight;
   float level_max_angle;
   float low_rate_mulitplier;
   float sticks_deadband;
@@ -47,6 +87,9 @@ typedef struct {
   MEMBER(mode, uint8)                        \
   MEMBER(silverware, rate_mode_silverware_t) \
   MEMBER(betaflight, rate_mode_betaflight_t) \
+  MEMBER(actual, rate_mode_actual_t)         \
+  MEMBER(kiss, rate_mode_kiss_t)             \
+  MEMBER(raceflight, rate_mode_raceflight_t) \
   MEMBER(level_max_angle, float)             \
   MEMBER(low_rate_mulitplier, float)         \
   MEMBER(sticks_deadband, float)

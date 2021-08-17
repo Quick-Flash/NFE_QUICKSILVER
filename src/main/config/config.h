@@ -52,6 +52,45 @@
 #define BF_EXPO_PITCH 0.40
 #define BF_EXPO_YAW 0.40
 
+// ******************** ACTUAL_RATES ********************
+#define ACTUAL_CENTER_SENS_ROLL 250
+#define ACTUAL_CENTER_SENS_PITCH 250
+#define ACTUAL_CENTER_SENS_YAW 250
+
+#define ACTUAL_MAX_RATE_ROLL 860.0
+#define ACTUAL_MAX_RATE_PITCH 860.0
+#define ACTUAL_MAX_RATE_YAW 860.0
+
+#define ACTUAL_EXPO_ROLL 0.5
+#define ACTUAL_EXPO_PITCH 0.5
+#define ACTUAL_EXPO_YAW 0.5
+
+// ******************** KISS_RATES ********************
+#define KISS_RC_RATE_ROLL 0.70
+#define KISS_RC_RATE_PITCH 0.70
+#define KISS_RC_RATE_YAW 0.70
+
+#define KISS_RATE_ROLL 0.70
+#define KISS_RATE_PITCH 0.70
+#define KISS_RATE_YAW 0.70
+
+#define KISS_CURVE_ROLL 0.40
+#define KISS_CURVE_PITCH 0.40
+#define KISS_CURVE_YAW 0.40
+
+// ******************** RACEFLIGHT_RATES ********************
+#define RACEFLIGHT_RATE_ROLL 400
+#define RACEFLIGHT_RATE_PITCH 400
+#define RACEFLIGHT_RATE_YAW 400
+
+#define RACEFLIGHT_EXPO_ROLL 0.50
+#define RACEFLIGHT_EXPO_PITCH 0.50
+#define RACEFLIGHT_EXPO_YAW 0.50
+
+#define RACEFLIGHT_ACRO_PLUS_ROLL 140.0
+#define RACEFLIGHT_ACRO_PLUS_PITCH 140.0
+#define RACEFLIGHT_ACRO_PLUS_YAW 140.0
+
 // *************max angle for level mode
 #define LEVEL_MAX_ANGLE 65.0f
 
@@ -272,7 +311,7 @@
 //#define MOTOR_BEEPS
 //#define MOTOR_BEEPS_TIMEOUT 1e6
 
-// *************enable inverted flight code ( brushless only ) - WARNING - NEVER TESTED 
+// *************enable inverted flight code ( brushless only ) - WARNING - NEVER TESTED
 //#define INVERTED_ENABLE
 //#define FN_INVERTED AUX_CHANNEL_OFF //for brushless only
 
@@ -300,4 +339,3 @@
 
 // throttle direct to motors for thrust measure
 //#define MOTORS_TO_THROTTLE
-

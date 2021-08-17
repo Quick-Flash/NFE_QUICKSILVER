@@ -75,7 +75,7 @@ const pid_rate_preset_t pid_rate_presets[] = {
             .kp = {127, 127, 148},
             .ki = {77, 77, 77},
             .kd = {101, 101, 13},
-        
+
         },
     },
 
@@ -298,6 +298,57 @@ const profile_t default_profile = {
                 BF_EXPO_YAW,
             },
         },
+        .actual = {
+            .center_sensitivity = {
+                ACTUAL_CENTER_SENS_ROLL,
+                ACTUAL_CENTER_SENS_PITCH,
+                ACTUAL_CENTER_SENSE_YAW,
+            },
+            .max_rate = {
+                ACTUAL_MAX_RATE_ROLL,
+                ACTUAL_MAX_RATE_PITCH,
+                ACTUAL_MAX_RATE_YAW,
+            },
+            .expo = {
+                ACTUAL_EXPO_ROLL,
+                ACTUAL_EXPO_PITCH,
+                ACTUAL_EXPO_YAW,
+            },
+        },
+        .kiss = {
+            .rc_rate = {
+                KISS_RC_RATE_ROLL,
+                KISS_RC_RATE_PITCH,
+                KISS_RC_RATE_YAW,
+            },
+            .rate = {
+                KISS_RATE_ROLL,
+                KISS_RATE_PITCH,
+                KISS_RATE_YAW,
+            },
+            .curve = {
+                KISS_CURVE_ROLL,
+                KISS_CURVE_PITCH,
+                KISS_CURVE_YAW,
+            },
+        },
+        .raceflight = {
+            .rate = {
+                RACEFLIGHT_RATE_ROLL,
+                RACEFLIGHT_RATE_PITCH,
+                RACEFLIGHT_RATE_YAW,
+            },
+            .expo = {
+                RACEFLIGHT_EXPO_ROLL,
+                RACEFLIGHT_EXPO_PITCH,
+                RACEFLIGHT_EXPO_YAW,
+            },
+            .acro_plus = {
+                RACEFLIGHT_ACRO_PLUS_ROLL,
+                RACEFLIGHT_ACRO_PLUS_PITCH,
+                RACEFLIGHT_ACRO_PLUS_YAW,
+            },
+        },
 
         .level_max_angle = LEVEL_MAX_ANGLE,
         .low_rate_mulitplier = LOW_RATES_MULTI,
@@ -516,6 +567,18 @@ CBOR_START_STRUCT_ENCODER(rate_mode_betaflight_t)
 BETAFLIGHT_RATE_MEMBERS
 CBOR_END_STRUCT_ENCODER()
 
+CBOR_START_STRUCT_ENCODER(rate_mode_actual_t)
+ACTUAL_RATE_MEMBERS
+CBOR_END_STRUCT_ENCODER()
+
+CBOR_START_STRUCT_ENCODER(rate_mode_kiss_t)
+KISS_RATE_MEMBERS
+CBOR_END_STRUCT_ENCODER()
+
+CBOR_START_STRUCT_ENCODER(rate_mode_raceflight_t)
+RACEFLIGHT_RATE_MEMBERS
+CBOR_END_STRUCT_ENCODER()
+
 CBOR_START_STRUCT_ENCODER(profile_rate_t)
 RATE_MEMBERS
 CBOR_END_STRUCT_ENCODER()
@@ -638,6 +701,18 @@ CBOR_END_STRUCT_DECODER()
 
 CBOR_START_STRUCT_DECODER(rate_mode_betaflight_t)
 BETAFLIGHT_RATE_MEMBERS
+CBOR_END_STRUCT_DECODER()
+
+CBOR_START_STRUCT_DECODER(rate_mode_actual_t)
+ACTUAL_RATE_MEMBERS
+CBOR_END_STRUCT_DECODER()
+
+CBOR_START_STRUCT_DECODER(rate_mode_kiss_t)
+KISS_RATE_MEMBERS
+CBOR_END_STRUCT_DECODER()
+
+CBOR_START_STRUCT_DECODER(rate_mode_raceflight_t)
+RACEFLIGHT_RATE_MEMBERS
 CBOR_END_STRUCT_DECODER()
 
 CBOR_START_STRUCT_DECODER(profile_rate_t)

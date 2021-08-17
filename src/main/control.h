@@ -49,6 +49,7 @@ typedef struct {
 
   vec4_t rx;          // holds the raw or calibrated main four channels, roll, pitch, yaw, throttle
   vec4_t rx_filtered; // same as above, but with constraints(just in case), expo applied smoothing applied and deadband applied
+  vec4_t rx_filtered_no_expo; // same as the above but with no expo applied.
   vec4_t rx_override; // override values, activated by controls_override
 
   stick_calibration_wizard_t stick_calibration_wizard; // current phase of the calibration wizard
@@ -97,6 +98,7 @@ typedef struct {
   MEMBER(vreffilt, float)                   \
   MEMBER(rx, vec4_t)                        \
   MEMBER(rx_filtered, vec4_t)               \
+  MEMBER(rx_filtered_no_expo, vec4_t)       \
   MEMBER(rx_override, vec4_t)               \
   MEMBER(stick_calibration_wizard, uint8)   \
   MEMBER(rx_rssi, float)                    \

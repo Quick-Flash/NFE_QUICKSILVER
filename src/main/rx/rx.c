@@ -22,7 +22,22 @@ float rx_expo(float in, float exp) {
     exp = 1;
   if (exp < -1)
     exp = -1;
-  float ans = in * in * in * exp + in * (1 - exp);
+  float ans;
+  switch (profile.rate.mode) {
+    case RATE_MODE_SILVERWARE:
+    case RATE_MODE_KISS:
+      ans = in * in * in * exp + in * (1 - exp);
+      break;
+    case RATE_MODE_BETAFLIGHT:
+      ans = abs(in) * in * in * in * exp + in * (1 - exp);
+      break;
+    case RATE_MODE_ACTUAL:
+      ans = abs(in) * in * in * in * in * in * exp + in * (1 - exp);
+      break;
+    case RATE_MODE_RACEFLIGHT:
+      ans = (1 + exp * (in * in -1)) * in;
+      break;
+  }
   limitf(&ans, 1.0);
   return ans;
 }
@@ -48,12 +63,27 @@ void rx_apply_expo(void) {
       .yaw = 0,
   };
 
-  if (profile.rate.mode == RATE_MODE_BETAFLIGHT) {
+  switch (profile.rate.mode) {
+    case RATE_MODE_BETAFLIGHT:
     angle_expo = profile.rate.betaflight.expo;
     acro_expo = profile.rate.betaflight.expo;
-  } else {
+    break;
+    case RATE_MODE_SILVERWARE:
     angle_expo = profile.rate.silverware.angle_expo;
     acro_expo = profile.rate.silverware.acro_expo;
+    break;
+    case RATE_MODE_ACTUAL:
+    angle_expo = profile.rate.actual.expo;
+    acro_expo = profile.rate.actual.expo;
+    break;
+    case RATE_MODE_KISS:
+    angle_expo = profile.rate.kiss.rc_curve;
+    acro_expo = profile.rate.kiss.rc_curve;
+    break;
+    case RATE_MODE_RACEFLIGHT:
+    angle_expo = profile.rate.raceflight.expo;
+    acro_expo = profile.rate.raceflight.expo;
+    break;
   }
 
   vec3_t expo = {
@@ -82,19 +112,13 @@ void rx_apply_expo(void) {
   }
 
   if (expo.roll > 0.01) {
-    state.rx_filtered.axis[0] = rx_expo(state.rx.axis[0], expo.roll);
-  } else {
-    state.rx_filtered.axis[0] = state.rx.axis[0];
+    state.rx_filtered.axis[0] = rx_expo(state.rx_filtered.axis[0], expo.roll);
   }
   if (expo.pitch > 0.01) {
-    state.rx_filtered.axis[1] = rx_expo(state.rx.axis[1], expo.pitch);
-  } else {
-    state.rx_filtered.axis[1] = state.rx.axis[1];
+    state.rx_filtered.axis[1] = rx_expo(state.rx_filtered.axis[1], expo.pitch);
   }
   if (expo.yaw > 0.01) {
-    state.rx_filtered.axis[2] = rx_expo(state.rx.axis[2], expo.yaw);
-  } else {
-    state.rx_filtered.axis[2] = state.rx.axis[2];
+    state.rx_filtered.axis[2] = rx_expo(state.rx_filtered.axis[2], expo.yaw);
   }
 }
 
@@ -102,7 +126,7 @@ void rx_apply_smoothing(void) {
   for (int i = 0; i < 4; ++i) {
 #ifdef RX_SMOOTHING
     static float rx_temp[4] = {0, 0, 0, 0};
-    lpf(&rx_temp[i], state.rx_filtered.axis[i], FILTERCALC(state.looptime, 1.0f / (float)rx_smoothing_hz(RX_PROTOCOL)));
+    lpf(&rx_temp[i], state.rx.axis[i], FILTERCALC(state.looptime, 1.0f / (float)rx_smoothing_hz(RX_PROTOCOL)));
     state.rx_filtered.axis[i] = rx_temp[i];
     limitf(&state.rx_filtered.axis[i], 1.0);
 #else
@@ -129,8 +153,8 @@ void rx_apply_deadband(void) {
 
 void rx_precalc() {
   state.rx_filtered.throttle = constrainf(state.rx.throttle, 0.f, 1.f); //constrain throttle min and max and copy into next bucket
-  rx_apply_expo();                                                      //this also constrains and copies the rest of the sticks into rx_filtered.axis[i]
   rx_apply_smoothing();
+  rx_apply_expo();                                                      //this also constrains and copies the rest of the sticks into rx_filtered.axis[i]
   rx_apply_deadband();
 }
 
